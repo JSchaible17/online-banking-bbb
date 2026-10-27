@@ -1,0 +1,29 @@
+export const ACCOUNT={number:'0013074526',pin:'62948',iban:'DE00 7009 9900 0013 0745 26',bic:'BBBBDE00XXX',holder:'Lena Bäcker'};
+export const SCHOOL={name:'Staatliche Realschule Bobingen',iban:'DE00 7009 9900 0045 5000 01',amount:45500,purpose:'Skilager Lena Bäcker, Klasse 7'};
+export const HORSE={name:'Reitstall Sonnenhof',iban:'DE00 8124 6307 9826 1540 38',amount:3500,purpose:'Reitbeteiligung Lena Bäcker',start:'2026-11-01'};
+export const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n/100);
+export const iban=s=>String(s).replace(/ /g,'');
+export function cents(s){s=String(s).trim().replace(/\s|€/g,'');if(!/^\d+(?:[.,]\d{1,2})?$/.test(s))return null;const [a,b='']=s.replace(',','.').split('.');return Number(a)*100+Number(b.padEnd(2,'0'));}
+export function initial(){return {version:2,pin:ACCOUNT.pin,changed:false,logged:false,pinReused:false,reloginRequired:false,stage:1,done:[false,false,false,false],credited:false,transferred:false,order:null,debitUnderstood:false,cardLocked:false,transactions:[{id:'book',date:'26.10.2026',name:'Buchhandlung Leseglück',detail:'Kartenzahlung · Buch',value:-1499},{id:'welcome',date:'23.10.2026',name:'BBB · Startguthaben',detail:'Gutschrift zur Kontoeröffnung',value:2000}]};}
+export const balance=s=>s.transactions.reduce((a,t)=>a+t.value,0);
+export function validLogin(s,number,pin){return number===ACCOUNT.number&&pin===s.pin;}
+export function changePin(s,pin,repeat){if(!/^\d{5}$/.test(pin))throw Error('Prüfe die Regel über dem Eingabefeld: Die Übungs-PIN braucht genau fünf Ziffern.');if(pin===ACCOUNT.pin)throw Error('Wähle eine eigene PIN, die sich von der Start-PIN im Brief unterscheidet.');if(pin!==repeat)throw Error('Vergleiche deine beiden PIN-Eingaben. Sie müssen genau übereinstimmen.');s.pin=pin;s.changed=true;}
+export function finishAnalysis(s,money,missing){if(!s.changed)throw Error('Lege zuerst deine neue Übungs-PIN fest.');if(!s.seenTransactions)throw Error('Öffne zuerst die Umsatzanzeige und lies die gebuchten Kontobewegungen.');if(cents(money)!==501)throw Error('Lies den aktuellen Kontostand in der Kontoübersicht noch einmal genau ab.');if(cents(missing)!==244)throw Error('Vergleiche Lenas verfügbares Guthaben mit dem Betrag des Supermarkteinkaufs. Berechne die Differenz noch einmal.');s.done[0]=true;}
+export function nextStage(s){if(!s.done[s.stage-1])throw Error('Schließe zuerst den aktuellen Auftrag ab.');if(s.stage<4)s.stage++;}
+export function proceed(s){
+ if(!s.done[s.stage-1])throw Error('Schließe zuerst den aktuellen Auftrag ab.');
+ if(s.stage===1&&!s.pinReused){s.logged=false;s.reloginRequired=true;return false;}
+ nextStage(s);return true;
+}
+export function completeLogin(s){
+ s.logged=true;
+ if(s.changed)s.pinReused=true;
+ if(s.reloginRequired){s.reloginRequired=false;nextStage(s);}
+}
+export function creditMother(s){if(s.stage!==2||s.credited)return false;s.transactions.unshift({id:'mother',date:'28.10.2026',name:'Mama · Geldeingang',detail:'Skilager und zusätzliches Taschengeld',value:50000});s.credited=true;return true;}
+export function checkTransfer(s,d){if(s.stage!==2||!s.credited)throw Error('Prüfe zuerst, ob dein Kontostand und die Umsätze aktuell sind.');if(s.transferred)throw Error('Dieser Auftrag ist bereits ausgeführt.');if(d.name!==SCHOOL.name)throw Error('Vergleiche den Empfängernamen Buchstabe für Buchstabe mit dem Skilager-Aushang. Achte auch auf Groß- und Kleinschreibung.');if(iban(d.iban)!==iban(SCHOOL.iban))throw Error('Prüfe die IBAN am Skilager-Aushang Zeichen für Zeichen. Leerzeichen sind optional.');if(cents(d.amount)!==SCHOOL.amount)throw Error('Lies auf dem Skilager-Aushang nach, welcher Gesamtbetrag zu bezahlen ist.');if(d.purpose!==SCHOOL.purpose)throw Error('Übernimm den Verwendungszweck genau so, wie er auf dem Skilager-Aushang steht.');if(balance(s)<SCHOOL.amount)throw Error('Prüfe, ob alle neuen Umsätze abgerufen wurden und das verfügbare Guthaben ausreicht.');}
+export function transfer(s,d){checkTransfer(s,d);s.transactions.unshift({id:'school',date:'28.10.2026',name:SCHOOL.name,detail:d.purpose,value:-SCHOOL.amount});s.transferred=true;s.done[1]=true;}
+export function checkOrder(s,d){if(s.stage!==3)throw Error('Dieser Auftrag ist noch nicht freigeschaltet.');if(s.order)throw Error('Der Dauerauftrag ist bereits eingerichtet.');if(d.name!==HORSE.name)throw Error('Lies den Empfängernamen auf dem Reitstall-Aushang genau. Prüfe jeden Buchstaben und die Groß- und Kleinschreibung.');if(iban(d.iban)!==iban(HORSE.iban))throw Error('Vergleiche die IBAN mit dem Reitstall-Aushang. Achte besonders auf Zahlendreher.');if(cents(d.amount)!==HORSE.amount)throw Error('Prüfe auf dem Reitstall-Aushang, welcher Betrag jeden Monat fällig ist.');if(d.start!==HORSE.start)throw Error('Lies auf dem Reitstall-Aushang nach, wann die erste Zahlung erfolgen soll.');if(d.cycle!=='monthly')throw Error('Lies auf dem Reitstall-Aushang nach, wie häufig gezahlt werden soll.');if(d.purpose!==HORSE.purpose)throw Error('Übernimm den Verwendungszweck genau vom Reitstall-Aushang.');}
+export function createOrder(s,d){checkOrder(s,d);s.order={...HORSE,cycle:'monthly',day:1};}
+export function checkDebitUnderstanding(s,payment,initiator,consent){if(s.stage!==3||!s.order)throw Error('Schließe zuerst den aktuellen Bankauftrag ab.');if(payment!=='direct-debit')throw Error('Lies im Infotext nach, wer beim Schulessen die Abbuchung auslöst.');if(initiator!=='provider')throw Error('Prüfe den Abschnitt zur Lastschrift: Wer veranlasst dort die Zahlung?');if(consent!=='parents')throw Error('Lies den Hinweis zu minderjährigen Kontoinhabern und der Zustimmung noch einmal.');s.debitUnderstood=true;s.done[2]=true;}
+export function lockCard(s){if(s.stage!==4)throw Error('Dieser Auftrag ist noch nicht freigeschaltet.');if(s.cardLocked)throw Error('Die Karte ist bereits gesperrt.');s.cardLocked=true;s.done[3]=true;}
