@@ -16,18 +16,263 @@
 'use strict';
 const QuizCore=(()=>{
 const questions=[
-{id:'basis',kind:'yesno',type:'Ja oder Nein',label:'Die Bezugsgröße',title:'Was entspricht 100 %?',statement:'Der ursprüngliche Grundwert entspricht auch nach einer Preiserhöhung weiterhin 100 %.',answer:true,explanation:'Ja. Die Erhöhung bezieht sich auf den ursprünglichen Grundwert. Er bleibt die Bezugsgröße mit 100 %.',hint:'Auf welchen Preis bezieht sich die Erhöhung?'},
-{id:'rabatt',kind:'yesno',type:'Ja oder Nein',label:'Rabatt richtig deuten',title:'20 % Rabatt: Was bleibt?',statement:'Nach 20 % Rabatt entspricht der neue Preis 20 % des ursprünglichen Preises.',answer:false,explanation:'Nein. 20 % beschreiben nur den Rabatt. Der neue Preis entspricht 100 % − 20 % = 80 % des ursprünglichen Preises.',hint:'Unterscheide die Ersparnis und den Preis, den du noch bezahlst.'},
-{id:'begriffe',kind:'cloze',type:'Wortspeicher',label:'Begriffe vervollständigen',title:'Mehr oder weniger?',words:['weniger','erhöht','mehr','verringert'],answers:['erhöht','mehr','verringert','weniger'],explanation:'Beim vermehrten Grundwert wird erhöht: Der neue Wert entspricht mehr als 100 %. Beim verminderten Grundwert wird verringert: Der neue Wert entspricht weniger als 100 %.',hint:'Vergleiche beide Veränderungen jeweils mit den ursprünglichen 100 %.'},
-{id:'zuordnen',kind:'match',type:'Kärtchen zuordnen',label:'Geld und Prozent',title:'Welche Angaben gehören zusammen?',scenario:'Eine Kinokarte kostet nach 25 % Erhöhung jetzt 15,00 €.',words:['25 %','15,00 €','100 %','125 %'],answers:['15,00 €','125 %','25 %','100 %'],labels:['Bekannter neuer Preis','Prozentsatz des neuen Preises','Erhöhungssatz','Prozentsatz des ursprünglichen Preises'],explanation:'15,00 € sind der neue Preis und gehören zu 125 %. Die Erhöhung beträgt 25 %. Der ursprüngliche Preis entspricht weiterhin 100 %.',hint:'Der bekannte Preis enthält bereits die Erhöhung. Addiere 25 % zu den ursprünglichen 100 %.'},
-{id:'bruchplus',kind:'fraction',type:'Rechenbruch',label:'Vermehrter Grundwert',title:'Wie hoch ist die Erhöhung?',scenario:'Eine Karte kostet nach 20 % Erhöhung jetzt 12,00 €. Berechne die Erhöhung und den ursprünglichen Preis.',words:['100','20','12,00 €','120'],answers:['12,00 €','20','120'],amount:12,change:20,percent:120,sign:-1,result:2,old:10,firstLabel:'Erhöhung in Euro',explanation:'Erhöhung: (12,00 € · 20) : 120 = 2,00 €. Ursprünglicher Preis: 12,00 € − 2,00 € = 10,00 €. Die bekannten 12,00 € gehören zu 120 %.',hint:'Gesucht sind zuerst die 20 % Erhöhung. Die bekannten 12,00 € entsprechen 120 %, nicht 100 %.'},
-{id:'bruchminus',kind:'fraction',type:'Rechenbruch',label:'Verminderter Grundwert',title:'Wie viel wurde gespart?',scenario:'Eine Karte kostet nach 20 % Rabatt noch 8,00 €. Berechne die Ersparnis und den ursprünglichen Preis.',words:['20','100','80','8,00 €'],answers:['8,00 €','20','80'],amount:8,change:20,percent:80,sign:1,result:2,old:10,firstLabel:'Ersparnis in Euro',explanation:'Ersparnis: (8,00 € · 20) : 80 = 2,00 €. Ursprünglicher Preis: 8,00 € + 2,00 € = 10,00 €. Die bekannten 8,00 € gehören zu 80 %.',hint:'Der Preis nach 20 % Rabatt gehört zu 80 %. Die gesuchte Ersparnis gehört zu 20 %.'},
-{id:'rechnenplus',kind:'calculate',type:'Selbst rechnen',label:'Preiserhöhung',title:'Der neue Preis enthält die Erhöhung',scenario:'Ein Kopfhörer kostet nach 10 % Preiserhöhung jetzt 66,00 €. Berechne die Erhöhung und den ursprünglichen Preis.',amount:66,change:10,percent:110,sign:-1,result:6,old:60,firstLabel:'Erhöhung in Euro',explanation:'66,00 € entsprechen 110 %. Erhöhung: (66,00 € · 10) : 110 = 6,00 €. Ursprünglicher Preis: 66,00 € − 6,00 € = 60,00 €.',hint:'Berechne zuerst die Erhöhung aus dem bekannten neuen Preis. Ziehe sie anschließend vom neuen Preis ab.'},
-{id:'rechnenminus',kind:'calculate',type:'Selbst rechnen',label:'Preisnachlass',title:'Wie teuer war der Hoodie vorher?',scenario:'Ein Hoodie kostet nach 25 % Rabatt noch 36,00 €. Berechne die Ersparnis und den ursprünglichen Preis.',amount:36,change:25,percent:75,sign:1,result:12,old:48,firstLabel:'Ersparnis in Euro',explanation:'36,00 € entsprechen 75 %. Ersparnis: (36,00 € · 25) : 75 = 12,00 €. Ursprünglicher Preis: 36,00 € + 12,00 € = 48,00 €.',hint:'Nach 25 % Rabatt bleiben 75 %. Addiere die Ersparnis zum verminderten Preis, um den ursprünglichen Preis zu erhalten.'}
+  {
+    "id": "basis",
+    "kind": "yesno",
+    "type": "Ja oder Nein",
+    "label": "Die Bezugsgröße",
+    "title": "Was entspricht 100 %?",
+    "statement": "Der ursprüngliche Grundwert entspricht auch nach einer Preiserhöhung weiterhin 100 %.",
+    "answer": true,
+    "explanation": "Ja. Die Erhöhung bezieht sich auf den ursprünglichen Grundwert. Er bleibt die Bezugsgröße mit 100 %.",
+    "hint": "Auf welchen Preis bezieht sich die Erhöhung?"
+  },
+  {
+    "id": "versand",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Versandkosten",
+    "title": "Die Versandkosten steigen",
+    "scenario": "Der Versand eines Päckchens kostete bisher 2,40 €. Die Versandkosten steigen um 10 %. Berechne die Erhöhung und die neuen Versandkosten.",
+    "amount": 2.4,
+    "change": 10,
+    "percent": 100,
+    "sign": 1,
+    "result": 0.24,
+    "final": 2.64,
+    "firstLabel": "Erhöhung in Euro",
+    "finalLabel": "Neue Versandkosten",
+    "explanation": "Erhöhung: (2,40 € · 10) : 100 = 0,24 €. Neue Versandkosten: 2,40 € + 0,24 € = 2,64 €.",
+    "hint": "Hier ist der ursprüngliche Preis bekannt. Er gehört zu 100 %. Addiere die Erhöhung anschließend zum bisherigen Preis.",
+    "goal": "forward"
+  },
+  {
+    "id": "begriffe",
+    "kind": "cloze",
+    "type": "Wortspeicher",
+    "label": "Begriffe vervollständigen",
+    "title": "Mehr oder weniger?",
+    "words": [
+      "weniger",
+      "erhöht",
+      "mehr",
+      "verringert"
+    ],
+    "answers": [
+      "erhöht",
+      "mehr",
+      "verringert",
+      "weniger"
+    ],
+    "explanation": "Beim vermehrten Grundwert wird erhöht: Der neue Wert entspricht mehr als 100 %. Beim verminderten Grundwert wird verringert: Der neue Wert entspricht weniger als 100 %.",
+    "hint": "Vergleiche beide Veränderungen jeweils mit den ursprünglichen 100 %."
+  },
+  {
+    "id": "musik",
+    "kind": "fraction",
+    "type": "Rechenbruch",
+    "label": "Vermehrter Grundwert",
+    "title": "Der Musikunterricht wird teurer",
+    "scenario": "Eine Musikstunde kostet nach 5 % Erhöhung jetzt 63,00 €. Vervollständige den Bruch und berechne die Erhöhung sowie den ursprünglichen Preis.",
+    "amount": 63,
+    "change": 5,
+    "percent": 105,
+    "sign": -1,
+    "result": 3,
+    "final": 60,
+    "firstLabel": "Erhöhung in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "Erhöhung: (63,00 € · 5) : 105 = 3,00 €. Ursprünglicher Preis: 63,00 € − 3,00 € = 60,00 €. Die bekannten 63,00 € gehören zu 105 %.",
+    "hint": "Die bekannten 63,00 € enthalten die Erhöhung bereits und gehören zu 105 %. Gesucht sind zuerst die 5 % Erhöhung.",
+    "goal": "reverse",
+    "words": [
+      "105",
+      "63,00 €",
+      "100",
+      "5"
+    ],
+    "answers": [
+      "63,00 €",
+      "5",
+      "105"
+    ]
+  },
+  {
+    "id": "hoodie",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Kleidung",
+    "title": "Ein Hoodie im Angebot",
+    "scenario": "Ein Hoodie kostet nach 15 % Rabatt noch 68,00 €. Berechne die Ersparnis und den ursprünglichen Preis.",
+    "amount": 68,
+    "change": 15,
+    "percent": 85,
+    "sign": 1,
+    "result": 12,
+    "final": 80,
+    "firstLabel": "Ersparnis in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "68,00 € entsprechen 85 %. Ersparnis: (68,00 € · 15) : 85 = 12,00 €. Ursprünglicher Preis: 68,00 € + 12,00 € = 80,00 €.",
+    "hint": "Nach 15 % Rabatt bleiben 85 %. Die bekannten 68,00 € gehören deshalb zu 85 %. Addiere anschließend die Ersparnis.",
+    "goal": "reverse"
+  },
+  {
+    "id": "zuordnen",
+    "kind": "match",
+    "type": "Kärtchen zuordnen",
+    "label": "Ein Konzertangebot",
+    "title": "Welche Angaben gehören zusammen?",
+    "scenario": "Eine Konzertkarte kostet nach 10 % Rabatt noch 72,00 €.",
+    "words": [
+      "90 %",
+      "10 %",
+      "72,00 €",
+      "100 %"
+    ],
+    "answers": [
+      "72,00 €",
+      "90 %",
+      "10 %",
+      "100 %"
+    ],
+    "labels": [
+      "Bekannter ermäßigter Preis",
+      "Prozentsatz des ermäßigten Preises",
+      "Rabattsatz",
+      "Prozentsatz des ursprünglichen Preises"
+    ],
+    "explanation": "72,00 € sind der ermäßigte Preis und gehören zu 90 %. Der Rabatt beträgt 10 %. Der ursprüngliche Preis entspricht weiterhin 100 %.",
+    "hint": "Nach 10 % Rabatt bleiben 90 %. Verwechsle den Rabatt nicht mit dem Preis, den du bezahlst."
+  },
+  {
+    "id": "getraenke",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Getränkekarte",
+    "title": "Eine Getränkekarte wird günstiger",
+    "scenario": "Eine Getränkekarte kostet regulär 18,00 €. Bei einer Aktion gibt es 25 % Rabatt. Berechne die Ersparnis und den neuen Preis.",
+    "amount": 18,
+    "change": 25,
+    "percent": 100,
+    "sign": -1,
+    "result": 4.5,
+    "final": 13.5,
+    "firstLabel": "Ersparnis in Euro",
+    "finalLabel": "Neuer Preis",
+    "explanation": "Ersparnis: (18,00 € · 25) : 100 = 4,50 €. Neuer Preis: 18,00 € − 4,50 € = 13,50 €.",
+    "hint": "Der reguläre Preis ist bekannt und entspricht 100 %. Berechne den Rabatt und ziehe ihn vom regulären Preis ab.",
+    "goal": "forward"
+  },
+  {
+    "id": "rucksack",
+    "kind": "fraction",
+    "type": "Rechenbruch",
+    "label": "Verminderter Grundwert",
+    "title": "Ein Rucksack mit Rabatt",
+    "scenario": "Ein Rucksack kostet nach 30 % Rabatt noch 36,40 €. Vervollständige den Bruch und berechne die Ersparnis sowie den ursprünglichen Preis.",
+    "amount": 36.4,
+    "change": 30,
+    "percent": 70,
+    "sign": 1,
+    "result": 15.6,
+    "final": 52,
+    "firstLabel": "Ersparnis in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "Ersparnis: (36,40 € · 30) : 70 = 15,60 €. Ursprünglicher Preis: 36,40 € + 15,60 € = 52,00 €. Die bekannten 36,40 € gehören zu 70 %.",
+    "hint": "Nach 30 % Rabatt bleiben 70 %. Gesucht sind die 30 % Ersparnis. Die bekannten 36,40 € gehören zu 70 %, nicht zu 100 %.",
+    "goal": "reverse",
+    "words": [
+      "30",
+      "100",
+      "36,40 €",
+      "70"
+    ],
+    "answers": [
+      "36,40 €",
+      "30",
+      "70"
+    ]
+  },
+  {
+    "id": "fitness",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Sportkurs",
+    "title": "Der Sportkurs wird teurer",
+    "scenario": "Ein Sportkurs kostet nach 8 % Erhöhung jetzt 91,80 €. Berechne die Erhöhung und den ursprünglichen Preis.",
+    "amount": 91.8,
+    "change": 8,
+    "percent": 108,
+    "sign": -1,
+    "result": 6.8,
+    "final": 85,
+    "firstLabel": "Erhöhung in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "91,80 € entsprechen 108 %. Erhöhung: (91,80 € · 8) : 108 = 6,80 €. Ursprünglicher Preis: 91,80 € − 6,80 € = 85,00 €.",
+    "hint": "Der bekannte neue Preis gehört zu 108 %. Berechne daraus die 8 % Erhöhung und ziehe sie anschließend ab.",
+    "goal": "reverse"
+  },
+  {
+    "id": "skateboard",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Skateboard",
+    "title": "Ein Skateboard bekommt einen neuen Preis",
+    "scenario": "Ein Skateboard kostet bisher 45,00 €. Der Preis steigt um 12 %. Berechne die Erhöhung und den neuen Preis.",
+    "amount": 45,
+    "change": 12,
+    "percent": 100,
+    "sign": 1,
+    "result": 5.4,
+    "final": 50.4,
+    "firstLabel": "Erhöhung in Euro",
+    "finalLabel": "Neuer Preis",
+    "explanation": "Erhöhung: (45,00 € · 12) : 100 = 5,40 €. Neuer Preis: 45,00 € + 5,40 € = 50,40 €.",
+    "hint": "Hier ist der alte Preis bekannt und entspricht 100 %. Die Erhöhung wird zum alten Preis addiert.",
+    "goal": "forward"
+  },
+  {
+    "id": "brettspiel",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Brettspiel",
+    "title": "Ein Brettspiel im Schlussverkauf",
+    "scenario": "Ein Brettspiel kostet nach 35 % Rabatt noch 26,00 €. Berechne die Ersparnis und den ursprünglichen Preis.",
+    "amount": 26,
+    "change": 35,
+    "percent": 65,
+    "sign": 1,
+    "result": 14,
+    "final": 40,
+    "firstLabel": "Ersparnis in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "26,00 € entsprechen 65 %. Ersparnis: (26,00 € · 35) : 65 = 14,00 €. Ursprünglicher Preis: 26,00 € + 14,00 € = 40,00 €.",
+    "hint": "Nach 35 % Rabatt bleiben 65 %. Berechne zuerst die Ersparnis aus dem verminderten Preis und addiere sie anschließend.",
+    "goal": "reverse"
+  },
+  {
+    "id": "fahrtkarte",
+    "kind": "calculate",
+    "type": "Selbst rechnen",
+    "label": "Fahrtkosten",
+    "title": "Eine Monatskarte wird teurer",
+    "scenario": "Eine Monatskarte kostet nach 25 % Erhöhung jetzt 96,00 €. Berechne die Erhöhung und den ursprünglichen Preis.",
+    "amount": 96,
+    "change": 25,
+    "percent": 125,
+    "sign": -1,
+    "result": 19.2,
+    "final": 76.8,
+    "firstLabel": "Erhöhung in Euro",
+    "finalLabel": "Ursprünglicher Preis",
+    "explanation": "96,00 € entsprechen 125 %. Erhöhung: (96,00 € · 25) : 125 = 19,20 €. Ursprünglicher Preis: 96,00 € − 19,20 € = 76,80 €.",
+    "hint": "Der neue Preis entspricht 125 %. Berechne die 25 % Erhöhung und ziehe sie vom neuen Preis ab.",
+    "goal": "reverse"
+  }
 ];
 function parseMoney(raw){if(typeof raw!=='string')return null;const s=raw.trim().replace(/\s/g,'').replace(/€$/,'');if(!/^\d+(?:[.,]\d{1,2})?$/.test(s))return null;const n=Number(s.replace(',','.'));return Number.isFinite(n)?n:null;}
 function sameMoney(raw,n){const x=parseMoney(raw);return x!==null&&Math.abs(x-n)<.005;}
-function validate(q,a){if(q.kind==='yesno'){if(typeof a.choice!=='boolean')return {complete:false,correct:false};return {complete:true,correct:a.choice===q.answer};}if(q.kind==='cloze'||q.kind==='match'){const filled=Array.isArray(a.slots)&&a.slots.length===q.answers.length&&a.slots.every(x=>typeof x==='string'&&x.length>0);return {complete:filled,correct:filled&&q.answers.every((x,i)=>x===a.slots[i])};}const numberComplete=parseMoney(a.first)!==null&&parseMoney(a.old)!==null;const slotsComplete=q.kind!=='fraction'||(Array.isArray(a.slots)&&a.slots.length===3&&a.slots.every(Boolean));return {complete:numberComplete&&slotsComplete,correct:numberComplete&&slotsComplete&&sameMoney(a.first,q.result)&&sameMoney(a.old,q.old)&&(q.kind!=='fraction'||q.answers.every((x,i)=>a.slots[i]===x))};}
+function validate(q,a){if(q.kind==='yesno'){if(typeof a.choice!=='boolean')return {complete:false,correct:false};return {complete:true,correct:a.choice===q.answer};}if(q.kind==='cloze'||q.kind==='match'){const filled=Array.isArray(a.slots)&&a.slots.length===q.answers.length&&a.slots.every(x=>typeof x==='string'&&x.length>0);return {complete:filled,correct:filled&&q.answers.every((x,i)=>x===a.slots[i])};}const numberComplete=parseMoney(a.first)!==null&&parseMoney(a.old)!==null;const slotsComplete=q.kind!=='fraction'||(Array.isArray(a.slots)&&a.slots.length===3&&a.slots.every(Boolean));return {complete:numberComplete&&slotsComplete,correct:numberComplete&&slotsComplete&&sameMoney(a.first,q.result)&&sameMoney(a.old,q.final)&&(q.kind!=='fraction'||q.answers.every((x,i)=>a.slots[i]===x))};}
 return Object.freeze({questions,parseMoney,sameMoney,validate});
 })();
 </script>
@@ -37,16 +282,16 @@ return Object.freeze({questions,parseMoney,sameMoney,validate});
 const app=document.querySelector('#app'),Q=QuizCore.questions;
 let order=Q.map((_,i)=>i),index=0,results=[],answer={},selected=null,attempts=0,done=false,seenWrong=false,review=false;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function intro(){app.innerHTML=`<section class="panel"><p class="eyebrow">Dein Abschlusscheck</p><h1>Vermehrter und<br>verminderter Grundwert</h1><p class="intro">Der Kinoabend ist teurer geworden. Beim nächsten Angebot gibt es Rabatt. Wie sicher rechnest du mit beiden Veränderungen?</p><div class="ticketline"><span><strong>8</strong> Aufgaben</span><span>etwa <strong>5–8 Minuten</strong></span><span>Handy oder Tablet</span></div><p>Prüfe Aussagen, vervollständige Merksätze und berechne Preise. Du bekommst zu jeder Aufgabe eine Rückmeldung. Papier und Stift helfen beim Rechnen.</p><button class="primary startbutton" id="start">Spiel starten</button><p class="privacy">Kein Name, kein Konto. Das Spiel speichert keine persönlichen Angaben.</p></section>`;document.querySelector('#start').addEventListener('click',()=>start(false));}
+function intro(){app.innerHTML=`<section class="panel"><p class="eyebrow">Dein Abschlusscheck</p><h1>Vermehrter und<br>verminderter Grundwert</h1><p class="intro">Preise steigen, Angebote werden günstiger. Berechne unterschiedliche Veränderungen bei Versand, Kleidung, Freizeit und Fahrtkosten.</p><div class="ticketline"><span><strong>12</strong> Aufgaben</span><span>etwa <strong>10–15 Minuten</strong></span><span>Handy oder Tablet</span></div><p>Neun Rechenaufgaben mit unterschiedlichen Zahlen und drei kurze Wissensaufgaben. Du berechnest mal den neuen, mal den ursprünglichen Preis. Papier und Stift helfen dir dabei.</p><button class="primary startbutton" id="start">Spiel starten</button><p class="privacy">Kein Name, kein Konto. Das Spiel speichert keine persönlichen Angaben.</p></section>`;document.querySelector('#start').addEventListener('click',()=>start(false));}
 function start(isReview=false){if(!isReview){order=Q.map((_,i)=>i);review=false;}else{order=results.filter(x=>!x.firstTry).map(x=>x.qIndex);review=true;}index=0;results=[];load();}
 function load(){const q=Q[order[index]];answer={slots:Array(q.answers?.length||0).fill(''),choice:null,first:'',old:''};selected=null;attempts=0;done=false;seenWrong=false;render();}
 function pool(q){return `<div class="wordbank" aria-label="Wortspeicher">${q.words.map(w=>`<button type="button" class="chip" draggable="true" data-word="${esc(w)}" aria-pressed="false">${esc(w)}</button>`).join('')}</div>`;}
 function slot(i,label,cls=''){return `<button type="button" class="${cls||'drop'}" data-slot="${i}" aria-label="${esc(label)}"><small>${esc(label)}</small></button>`;}
-function fields(q){return `<div class="resultfields"><div class="field"><label for="first">${esc(q.firstLabel)}</label><div class="euroinput"><input id="first" type="text" inputmode="decimal" autocomplete="off" aria-describedby="moneyhint"><span>€</span></div></div><div class="field"><label for="old">Ursprünglicher Preis</label><div class="euroinput"><input id="old" type="text" inputmode="decimal" autocomplete="off" aria-describedby="moneyhint"><span>€</span></div></div></div><p id="moneyhint" class="instruction">Du kannst zum Beispiel 2 oder 2,00 eingeben.</p>`;}
+function fields(q){return `<div class="resultfields"><div class="field"><label for="first">${esc(q.firstLabel)}</label><div class="euroinput"><input id="first" type="text" inputmode="decimal" autocomplete="off" aria-describedby="moneyhint"><span>€</span></div></div><div class="field"><label for="old">${esc(q.finalLabel)}</label><div class="euroinput"><input id="old" type="text" inputmode="decimal" autocomplete="off" aria-describedby="moneyhint"><span>€</span></div></div></div><p id="moneyhint" class="instruction">Du kannst zum Beispiel 2 oder 2,00 eingeben.</p>`;}
 function questionBody(q){if(q.kind==='yesno')return `<p class="instruction">Überprüfe die Aussage.</p><p class="statement">${esc(q.statement)}</p><div class="choice-row"><button type="button" class="choice" data-choice="yes" aria-pressed="false">Ja</button><button type="button" class="choice" data-choice="no" aria-pressed="false">Nein</button></div>`;
 if(q.kind==='cloze')return `<p class="instruction">Vervollständige den Text mit dem Wortspeicher. Tippe zuerst auf ein Wort und dann auf die passende Lücke.</p>${pool(q)}<div class="cloze">Beim vermehrten Grundwert wird der ursprüngliche Grundwert ${slot(0,'Lücke 1','blank')}. Der neue Wert entspricht ${slot(1,'Lücke 2','blank')} als 100 %.<br>Beim verminderten Grundwert wird der ursprüngliche Grundwert ${slot(2,'Lücke 3','blank')}. Der neue Wert entspricht ${slot(3,'Lücke 4','blank')} als 100 %.</div>`;
 if(q.kind==='match')return `<p class="scenario">${esc(q.scenario)}</p><p class="instruction">Ordne die Kärtchen zu. Tippe zuerst ein Kärtchen an, dann das passende Feld. Am Computer kannst du auch ziehen.</p>${pool(q)}<div class="assign">${q.labels.map((l,i)=>`<div class="assign-row"><span>${esc(l)}</span>${slot(i,'Feld '+(i+1))}</div>`).join('')}</div>`;
-if(q.kind==='fraction')return `<p class="scenario">${esc(q.scenario)}</p><p class="instruction">Vervollständige den Rechenbruch mit den Kärtchen. Berechne anschließend beide Geldbeträge.</p>${pool(q)}<div class="equation"><span class="x">x =</span><div class="fraction"><div class="numerator">${slot(0,'Geldbetrag','drop money-slot')}<span class="times" aria-label="mal">·</span>${slot(1,'Prozentzahl')}</div><div class="denominator">${slot(2,'Prozentzahl')}</div></div></div>${fields(q)}`;
+if(q.kind==='fraction')return `<p class="scenario">${esc(q.scenario)}</p><p class="instruction">Ordne die Kärtchen im Rechenbruch zu. Berechne anschließend beide Geldbeträge.</p>${pool(q)}<div class="equation"><span class="x">x =</span><div class="fraction"><div class="numerator">${slot(0,'Geldbetrag','drop money-slot')}<span class="times" aria-label="mal">·</span>${slot(1,'Prozentzahl')}</div><div class="denominator">${slot(2,'Prozentzahl')}</div></div></div>${fields(q)}`;
 return `<p class="scenario">${esc(q.scenario)}</p><p class="instruction">Nutze deinen Rechenbruch auf Papier und trage die Ergebnisse ein.</p>${fields(q)}`;}
 function render(){const q=Q[order[index]];app.innerHTML=`<section class="panel" aria-labelledby="question-title"><div class="meta"><span>${review?'Trainingsrunde':esc(q.type)}</span><span>Aufgabe ${index+1} von ${order.length}</span></div><div class="progress" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="${order.length}" aria-valuenow="${index}"><span style="width:${100*index/order.length}%"></span></div><p class="eyebrow">${esc(q.label)}</p><h2 id="question-title" tabindex="-1">${esc(q.title)}</h2><form id="answer-form" novalidate>${questionBody(q)}<div id="feedback" role="status" aria-live="polite" hidden></div><div class="actionbar"><button class="primary" type="submit" id="check">Prüfen</button><button class="secondary" type="button" id="show-solution" hidden>Lösung ansehen</button><button class="primary" type="button" id="next" hidden>${index+1===order.length?'Auswertung':'Weiter'}</button></div></form><details class="hint"><summary>Ein Tipp</summary><p>${esc(q.hint)}</p></details></section>`;
 app.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>{if(done)return;answer.choice=b.dataset.choice==='yes';app.querySelectorAll('[data-choice]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));clearFeedback();}));
